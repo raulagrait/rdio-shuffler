@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/background_gradient">
+    
+    <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" 
+        android:layout_marginLeft="5dp" android:layout_marginBottom="0dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" 
+            android:text="Shuffler" android:textSize="35dp" android:textStyle="bold" android:layout_gravity="bottom" />
+        
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom"
+            android:text="Powered by" android:textSize="10dp" android:textStyle="bold" 
+            android:layout_marginLeft="5dp" android:layout_marginBottom="0dp"/>
+            
+    	<ImageView android:id="@+id/rdioLogo"  android:src="@drawable/rdio_white_logo_sm"
+    		android:layout_width="wrap_content" android:layout_height="wrap_content"
+    		android:layout_marginLeft="5dp"
+    		android:layout_gravity="bottom" android:layout_marginBottom="8dp" />    
+    		
+		<ImageView android:id="@+id/artistListIcon" android:src="@drawable/ic_menu_friendslist"
+    		android:layout_width="50dp" android:layout_height="50dp"
+    		android:layout_marginLeft="15dp" android:layout_gravity="center_vertical"/>  	    	
+    </LinearLayout>
+    	
+    <ImageView android:id="@+id/albumArt" android:src="@drawable/blank_album_art"
+    	android:adjustViewBounds="true" android:scaleType="fitXY"
+    	android:layout_width="fill_parent" android:layout_height="wrap_content"
+    	android:layout_margin="5dp" />
+    
+    <LinearLayout android:id="@+id/playercontrols" android:orientation="horizontal" android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" android:gravity="center_vertical|center_horizontal" android:layout_marginTop="5dp">
+		<ImageView android:id="@+id/playPause" android:src="@drawable/play" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+		<ImageView android:id="@+id/next" android:src="@drawable/next" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+   	</LinearLayout>
+   	
+	<LinearLayout android:id="@+id/trackInfo" android:orientation="vertical" android:layout_width="fill_parent"
+    	android:layout_height="wrap_content" android:gravity="center_vertical|center_horizontal" android:layout_marginTop="5dp">
+		<TextView android:id="@+id/trackName" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Some Cool Song Name"
+		    android:gravity="center" android:singleLine="true" android:ellipsize="marquee" />
+		<TextView android:id="@+id/artistName" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Artist Name"
+		    android:gravity="center" android:textStyle="bold" android:singleLine="true" android:ellipsize="none" />
+		<TextView android:id="@+id/albumName" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Album Name"
+		    android:gravity="center" android:singleLine="true" android:ellipsize="none"/>
+		
+		
+   	</LinearLayout>        
+        
+</LinearLayout>
