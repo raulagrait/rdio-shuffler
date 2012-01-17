@@ -17,11 +17,13 @@
     	<ImageView android:id="@+id/rdioLogo"  android:src="@drawable/rdio_white_logo_sm"
     		android:layout_width="wrap_content" android:layout_height="wrap_content"
     		android:layout_marginLeft="5dp"
-    		android:layout_gravity="bottom" android:layout_marginBottom="8dp" />    
+    		android:layout_gravity="bottom" android:layout_marginBottom="8dp" />  
+    		
+    	<LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1" />
     		
 		<ImageView android:id="@+id/artistListIcon" android:src="@drawable/ic_menu_friendslist"
     		android:layout_width="50dp" android:layout_height="50dp"
-    		android:layout_marginLeft="15dp" android:layout_gravity="center_vertical"/>  	    	
+    		android:layout_marginLeft="15dp" android:layout_gravity="right" />  	    	
     </LinearLayout>
     	
     <ImageView android:id="@+id/albumArt" android:src="@drawable/blank_album_art"

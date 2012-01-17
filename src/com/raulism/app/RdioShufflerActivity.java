@@ -65,6 +65,7 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 	
 	private Track _currentTrack;
 	private boolean _isPlaying;
+	private boolean _isCurrentActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -222,8 +223,8 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 
 			dismissDialog(Utilities.DIALOG_GETTING_COLLECTION);
 			
-			// If we're not playing something, then load something up
-			if (_player == null || !_player.isPlaying())
+			// If we are currently active and we're not playing something, then load something up
+			if (_isCurrentActivity && !isPlayingSomething())
 			{
 				next(true);
 			}
@@ -233,6 +234,11 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 			dismissDialog(Utilities.DIALOG_GETTING_COLLECTION);
 			Log.e(TAG, "Failed to handle JSONObject: ", e);
 		}
+	}
+	
+	private boolean isPlayingSomething()
+	{
+		return (_player != null && _player.isPlaying());
 	}
 
 	private void onOutOfTracks()
@@ -623,5 +629,19 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 		Intent intent = new Intent();
 		intent.setClass(this, ArtistRadioActivity.class);
 		startActivityForResult(intent, REQUEST_ARTIST_RADIO);
+	}
+	
+	@Override
+    public void onPause()
+    {        
+        super.onPause();
+        _isCurrentActivity = false;
+    }
+	
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		_isCurrentActivity = true;
 	}
 }
