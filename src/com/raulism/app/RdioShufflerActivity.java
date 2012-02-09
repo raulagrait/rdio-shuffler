@@ -57,6 +57,7 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 	
 	private ImageView _albumArt;
 	private ImageView _playPause;
+	private ImageView _fastForward;
 	private ImageView _artistListIcon;
 	
 	private TextView _trackName;
@@ -66,6 +67,8 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 	private Track _currentTrack;
 	private boolean _isPlaying;
 	private boolean _isCurrentActivity;
+	
+	private static final int THIRTY_SECONDS = 30 * 1000;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -572,8 +575,11 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
         ImageView nextImage = (ImageView) findViewById(R.id.next);
         nextImage.setOnClickListener(this);        
 
-        _playPause = (ImageView)findViewById(R.id.playPause);
+        _playPause = (ImageView) findViewById(R.id.playPause);
         _playPause.setOnClickListener(this);
+        
+        _fastForward = (ImageView) findViewById(R.id.fastForward);
+        _fastForward.setOnClickListener(this);
         
         _albumArt = (ImageView)findViewById(R.id.albumArt);
         
@@ -608,6 +614,9 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 		case R.id.playPause:
 			onPlayPauseClicked();
 			break;
+		case R.id.fastForward:
+			onFastForwardClicked();
+			break;
 		case R.id.artistListIcon:
 			onArtistListIconClicked();
 			break;
@@ -622,6 +631,19 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 	private void onPlayPauseClicked()
 	{
 		playPause();
+	}
+	
+	private void onFastForwardClicked()
+	{
+		if (_player != null && isPlayingSomething())
+		{
+			int currentPosition = _player.getCurrentPosition();
+			int nextPosition = currentPosition + THIRTY_SECONDS;
+			if (nextPosition < _player.getDuration())
+			{
+				_player.seekTo(nextPosition);
+			}
+		}
 	}
 	
 	private void onArtistListIconClicked()
