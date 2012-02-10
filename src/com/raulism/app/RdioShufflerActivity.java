@@ -34,10 +34,14 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,7 +61,6 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 	
 	private ImageView _albumArt;
 	private ImageView _playPause;
-	private ImageView _fastForward;
 	private ImageView _artistListIcon;
 	
 	private TextView _trackName;
@@ -67,8 +70,11 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 	private Track _currentTrack;
 	private boolean _isPlaying;
 	private boolean _isCurrentActivity;
-	
-	private static final int THIRTY_SECONDS = 30 * 1000;
+
+	private SeekBar _trackPositionBar;
+	private Handler _threadPositionHandler;
+	private Thread _positionThread;
+	private OnSeekBarChangeListener _seekBarChangeListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -80,6 +86,8 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 
         initializeControls();
         updateControls();
+        
+        initializePositionHandler();
     }
     
     @Override
@@ -261,6 +269,8 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 	
 	private void next(final boolean manualPlay)
 	{
+		stopPositionThread();
+		
 		if (_player != null)
 		{
 			_player.stop();
@@ -361,11 +371,13 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 				@Override
 				public void onCompletion(MediaPlayer mp)
 				{
-					next(false);							
+					next(false);					
 				}
-			});				
+			});					
 			
 			_player.start();
+
+			startPositionThread();
 		}
 		catch (Exception e)
 		{
@@ -577,10 +589,7 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 
         _playPause = (ImageView) findViewById(R.id.playPause);
         _playPause.setOnClickListener(this);
-        
-        _fastForward = (ImageView) findViewById(R.id.fastForward);
-        _fastForward.setOnClickListener(this);
-        
+
         _albumArt = (ImageView)findViewById(R.id.albumArt);
         
         _trackName = (TextView) findViewById(R.id.trackName);
@@ -591,6 +600,9 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
         
         _artistName = (TextView) findViewById(R.id.artistName);
         _artistName.setVisibility(View.GONE);
+        
+        _trackPositionBar = (SeekBar) findViewById(R.id.trackPositionBar);
+        _trackPositionBar.setOnSeekBarChangeListener(getOnSeekBarChangeListener());
 	}	
 	
 	private Rdio getRdio()
@@ -614,9 +626,6 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 		case R.id.playPause:
 			onPlayPauseClicked();
 			break;
-		case R.id.fastForward:
-			onFastForwardClicked();
-			break;
 		case R.id.artistListIcon:
 			onArtistListIconClicked();
 			break;
@@ -632,20 +641,7 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 	{
 		playPause();
 	}
-	
-	private void onFastForwardClicked()
-	{
-		if (_player != null && isPlayingSomething())
-		{
-			int currentPosition = _player.getCurrentPosition();
-			int nextPosition = currentPosition + THIRTY_SECONDS;
-			if (nextPosition < _player.getDuration())
-			{
-				_player.seekTo(nextPosition);
-			}
-		}
-	}
-	
+
 	private void onArtistListIconClicked()
 	{
 		Intent intent = new Intent();
@@ -666,4 +662,90 @@ public class RdioShufflerActivity extends Activity implements RdioListener, OnCl
 		super.onResume();
 		_isCurrentActivity = true;
 	}
+	
+    private void startPositionThread()
+    {
+    	_positionThread = new Thread(new Runnable()
+    	{		
+			@Override
+			public void run()
+			{
+				try
+				{
+					int currentPosition = 0;
+					int trackDuration = _player.getDuration();
+					_trackPositionBar.setMax(trackDuration);
+
+					while (_player != null)
+					{
+						currentPosition = _player.getCurrentPosition();						
+
+						Message msg = new Message();
+						msg.what = currentPosition;
+						_threadPositionHandler.sendMessage(msg);
+
+						Thread.sleep(1000);
+					}
+				}
+				catch (InterruptedException e)
+				{				
+					e.printStackTrace();
+				}
+				catch (IllegalStateException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		});
+    	_positionThread.start();
+    }
+    
+    private void stopPositionThread()
+    {
+    	if (_positionThread != null)
+    	{
+    		_positionThread = null;
+    	}
+    }
+    
+    private void initializePositionHandler()
+    {
+        _threadPositionHandler = new Handler()
+        {
+    		public void handleMessage(Message msg)
+    		{
+    			super.handleMessage(msg);
+    			_trackPositionBar.setProgress(msg.what);
+    		}
+    	};
+    }
+    
+    private OnSeekBarChangeListener getOnSeekBarChangeListener()
+    {
+    	if (_seekBarChangeListener == null)
+    	{
+    		_seekBarChangeListener = new OnSeekBarChangeListener()
+    		{				
+				@Override
+				public void onStopTrackingTouch(SeekBar seekBar)
+				{
+				}
+				
+				@Override
+				public void onStartTrackingTouch(SeekBar seekBar)
+				{
+				}
+				
+				@Override
+				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+				{
+					if (fromUser && isPlayingSomething())
+					{
+						_player.seekTo(progress);
+					}
+				}
+			};
+    	}
+    	return _seekBarChangeListener;
+    }
 }
